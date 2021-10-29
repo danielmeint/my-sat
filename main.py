@@ -11,6 +11,9 @@ class Sequent:
         self.antecedents = antecedents  # [[1, 2], [1, -2]]
         self.succedents = succedents  # [[1, 2], [3]]
 
+    def __str__(self) -> str:
+        return f'{self.antecedents} --> {self.succedents}'
+
     def is_axiom(self):
         return len(self.antecedents & self.succedents) > 0
 
@@ -18,6 +21,11 @@ class Sequent:
         return any([len(a) > 0 for a in self.antecedents])
 
     def apply_or_left(self):
+        # split up one of the antecedents that consists of more than one literal
+        aa_list = list(self.antecedents)
+        for a in aa_list:
+            if len(a) > 1:
+                print(f'splitting up {a}')
 
 
 def read_input():
@@ -39,14 +47,18 @@ def main():
     # take clauses as antecedents
     s = Sequent(clauses, set())
     print(clauses)
+    prove(s)
 
 
 def prove(s: Sequent):
+    print(f'proving {s}')
     if (s.is_axiom()):
         return None
 
-    if (not s.has_more_rules()):
+    if (not s.can_apply_or_left()):
         return []
+
+    s.apply_or_left()
 
 
 main()
