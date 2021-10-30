@@ -79,6 +79,20 @@ class Sequent:
 
                 return [new_sequent]
 
+    def extract_falsifying_assignment(self):
+        assignment = set()
+        if self.can_apply_left_rule():
+            raise Exception('this should not happen')
+        for antecedent in self.antecedents:
+            assert len(antecedent) == 1
+            literal = list(antecedent)[0]
+            assignment.add(literal)
+        for succedent in self.succedents:
+            assert len(succedent) == 1
+            literal = list(succedent)[0]
+            assignment.add(negate(literal))
+        return assignment
+
 
 def read_input():
     clauses = set()
@@ -109,12 +123,12 @@ def prove(s: Sequent):
         return 'closed branch'
 
     if (not s.can_apply_left_rule()):
-        return 'open branch'
+        return s.extract_falsifying_assignment()
 
     prems = s.apply_a_rule()
     for p in prems:
         answer = prove(p)
-        if (answer == 'open branch'):
+        if (answer != 'closed branch'):
             return answer
 
     return 'closed branch'
