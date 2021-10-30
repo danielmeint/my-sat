@@ -99,6 +99,9 @@ def read_input():
     clause_strs = sys.stdin.read().split('\n')
     for s in clause_strs:
         literals = frozenset([int(x) for x in s.split()])
+        if 0 in literals:
+            raise Exception(
+                'cannot use 0 as propositional variable; Please try again!')
         if (len(literals) > 0):
             clauses.add(literals)
     return clauses
@@ -114,7 +117,22 @@ def main():
     s = Sequent(clauses, set())
     print(clauses)
     result = prove(s)
-    print(result)
+
+    if result == 'closed branch':
+        # ¬Φ is valid; therefore, Φ is unsatisfiable
+        print('unsatisfiable')
+    else:
+        # ¬Φ is falsifiable; therefore, Φ is satisfiable
+        print('satisfiable')
+        print(f'minimum requirements for satisfying interpretation: {result}')
+
+        # there might be additional variables that are not contained in the min requirements, i.e., it doesn't matter if they are negated or not
+        # --> we simply include them all non-negated
+        all_variables = set([abs(v) for c in clauses for v in c])
+        print(all_variables)
+
+        # valid interpretation is the union of min requirements and remaining literals (non-negated)
+        valid_interpretation = result  # TODO
 
 
 def prove(s: Sequent):
@@ -123,6 +141,7 @@ def prove(s: Sequent):
         return 'closed branch'
 
     if (not s.can_apply_left_rule()):
+        # open branch
         return s.extract_falsifying_assignment()
 
     prems = s.apply_a_rule()
