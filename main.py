@@ -128,6 +128,17 @@ def read_std_in():
     return clauses
 
 
+def test_kth_bit(n, k):
+    print(bin(n))
+    return bin(n)[-(k+1)] == '1'
+
+
+def generate_clauses(n):
+    clauses = set()
+    for i in range(2**n):
+        print(i)
+
+
 def main():
     clauses = read_file(sys.argv[1]) if len(sys.argv) == 2 else read_std_in()
     print(clauses)
