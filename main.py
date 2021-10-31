@@ -40,7 +40,7 @@ class Sequent:
         for antecedent in aa_list:
             if len(antecedent) > 1:  # form is A v B
                 # convert set to list to use indexes
-                print(f'splitting up {antecedent}')
+                # print(f'splitting up {antecedent}')
                 antecedent_as_list = list(antecedent)
 
                 a = frozenset([antecedent_as_list[0]])  # first element
@@ -50,8 +50,8 @@ class Sequent:
                     c for c in aa_list if c != antecedent] + [a])
                 antecedents_with_b = set([
                     c for c in aa_list if c != antecedent] + [b])
-                print(f'--> antecedents with a: {antecedents_with_a}')
-                print(f'--> antecedents with b: {antecedents_with_b}')
+                # print(f'--> antecedents with a: {antecedents_with_a}')
+                # print(f'--> antecedents with b: {antecedents_with_b}')
 
                 # return new sequents used as premises
                 s_with_a = Sequent(antecedents_with_a, self.succedents)
@@ -108,6 +108,7 @@ def read_input():
 
 
 def main():
+    print('Provide one clause per line, press ENTER for the next clause or CTRL+D to start the validation.')
     clauses = read_input()
     # we are trying to show the satisfiability of Φ
     # this means, we show the falsibiability of ¬Φ
@@ -115,7 +116,7 @@ def main():
 
     # take clauses as antecedents
     s = Sequent(clauses, set())
-    print(clauses)
+    # print(clauses)
     result = prove(s)
 
     if result == 'closed branch':
@@ -128,15 +129,17 @@ def main():
 
         # there might be additional variables that are not contained in the min requirements, i.e., it doesn't matter if they are negated or not
         # --> we simply include them all non-negated
-        all_variables = set([abs(v) for c in clauses for v in c])
-        print(all_variables)
+        remaining_variables = set(
+            [abs(v) for c in clauses for v in c if not (v in result or negate(v) in result)])
 
         # valid interpretation is the union of min requirements and remaining literals (non-negated)
-        valid_interpretation = result  # TODO
+        satisfying_interpretation = result | remaining_variables
+        print(
+            f'example satisfying interpretation: {satisfying_interpretation}')
 
 
 def prove(s: Sequent):
-    print(f'proving {s}')
+    # print(f'proving {s}')
     if (s.is_axiom()):
         return 'closed branch'
 
