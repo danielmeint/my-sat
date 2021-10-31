@@ -6,6 +6,11 @@ def negate(x):
     return x * -1
 
 
+class Clause(frozenset):
+    def __str__(self) -> str:
+        return super().__str__()
+
+
 class Sequent:
     def __init__(self, antecedents, succedents):
         self.antecedents = antecedents  # [[1, 2], [1, -2]]
@@ -94,11 +99,10 @@ class Sequent:
         return assignment
 
 
-def read_input():
+def parse_clauses(lines):
     clauses = set()
-    clause_strs = sys.stdin.read().split('\n')
-    for s in clause_strs:
-        literals = frozenset([int(x) for x in s.split()])
+    for l in lines:
+        literals = frozenset([int(x) for x in l.split()])
         if 0 in literals:
             raise Exception(
                 'cannot use 0 as propositional variable; Please try again!')
@@ -107,9 +111,27 @@ def read_input():
     return clauses
 
 
+def read_file(fname):
+    print(f'reading clauses from {fname}')
+    f = open(fname, 'r')
+    lines = f.readlines()
+    clauses = parse_clauses(lines)
+    f.close()
+    return clauses
+
+
+def read_std_in():
+    print('Provide one clause per line (integers, space-separated), press ENTER for the next clause or CTRL+D to start the validation.\nPlease use integers (positive and negative, not zero) as literals.\nThe negation of 1 is represeted by -1. Example clause: 1 -2')
+    clauses = set()
+    clause_strs = sys.stdin.read().split('\n')
+    clauses = parse_clauses(clause_strs)
+    return clauses
+
+
 def main():
-    print('Provide one clause per line, press ENTER for the next clause or CTRL+D to start the validation.')
-    clauses = read_input()
+    clauses = read_file(sys.argv[1]) if len(sys.argv) == 2 else read_std_in()
+    print(clauses)
+
     # we are trying to show the satisfiability of Φ
     # this means, we show the falsibiability of ¬Φ
     # effectively, this means, try to show the validity of Φ ⇒
