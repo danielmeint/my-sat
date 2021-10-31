@@ -48,8 +48,8 @@ class Sequent:
                 # print(f'splitting up {antecedent}')
                 antecedent_as_list = list(antecedent)
 
-                a = frozenset([antecedent_as_list[0]])  # first element
-                b = frozenset(antecedent_as_list[1:])  # rest
+                a = Clause([antecedent_as_list[0]])  # first element
+                b = Clause(antecedent_as_list[1:])   # rest
 
                 antecedents_with_a = set([
                     c for c in aa_list if c != antecedent] + [a])
@@ -78,7 +78,7 @@ class Sequent:
                 new_antecedents = set(
                     [c for c in self.antecedents if c != antecedent])
                 new_succedents = set(
-                    list(self.succedents) + [frozenset([pos_literal])])
+                    list(self.succedents) + [Clause([pos_literal])])
 
                 new_sequent = Sequent(new_antecedents, new_succedents)
 
@@ -102,7 +102,7 @@ class Sequent:
 def parse_clauses(lines):
     clauses = set()
     for l in lines:
-        literals = frozenset([int(x) for x in l.split()])
+        literals = Clause([int(x) for x in l.split()])
         if 0 in literals:
             raise Exception(
                 'cannot use 0 as propositional variable; Please try again!')
