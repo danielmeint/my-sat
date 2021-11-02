@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import sys
+import time
 
 
 def negate(x):
@@ -13,8 +14,8 @@ class Clause(frozenset):
 
 class Sequent:
     def __init__(self, antecedents, succedents):
-        self.antecedents = antecedents  # [[1, 2], [1, -2]]
-        self.succedents = succedents  # [[1, 2], [3]]
+        self.antecedents = antecedents
+        self.succedents = succedents
 
     def __str__(self) -> str:
         return f'{self.antecedents} --> {self.succedents}'
@@ -129,14 +130,42 @@ def read_std_in():
 
 
 def test_kth_bit(n, k):
-    print(bin(n))
-    return bin(n)[-(k+1)] == '1'
+    # print(bin(n))
+    try:
+        return bin(n)[-(k+1)] == '1'
+    except:
+        return False
 
 
 def generate_clauses(n):
     clauses = set()
     for i in range(2**n):
-        print(i)
+        clause = Clause([k+1 if test_kth_bit(i, k)
+                        else (k+1) * -1 for k in range(n)])
+        clauses.add(clause)
+
+    return clauses
+
+
+'''
+method to test performance
+'''
+
+
+def test():
+    n = 1
+    while(True):
+        start = time.time()
+        clauses = generate_clauses(n)
+        print(clauses)
+        s = Sequent(clauses, set())
+        result = prove(s)
+
+        end = time.time()
+        print_result(clauses, result)
+        print(f'Took {end - start} seconds to solve')
+
+        n += 1
 
 
 def main():
@@ -149,9 +178,12 @@ def main():
 
     # take clauses as antecedents
     s = Sequent(clauses, set())
-    # print(clauses)
-    result = prove(s)
 
+    result = prove(s)
+    print_result(clauses, result)
+
+
+def print_result(clauses, result):
     if result == 'closed branch':
         # ¬Φ is valid; therefore, Φ is unsatisfiable
         print('unsatisfiable')
@@ -190,3 +222,4 @@ def prove(s: Sequent):
 
 
 main()
+# test()
